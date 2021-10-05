@@ -17,6 +17,76 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final String currentUserId = currentUser?.id;
+
+  buildCountColumn(String label, int count) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          count.toString(),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 4),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  editProfile() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EditProfile(currentUserId: currentUserId)));
+  }
+
+  Container buildButton({String text, Function function}) {
+    return Container(
+      padding: EdgeInsets.only(top: 2),
+      child: FlatButton(
+        onPressed: function,
+        child: Container(
+          width: 250,
+          height: 27,
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            border: Border.all(
+              color: Colors.blue,
+            ),
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
+      ),
+    );
+  }
+
+  buildProfileButton() {
+    // bool isProfileOwner = currentUserId == widget.profileId;
+    // if (isProfileOwner) {
+    //   return buildButton(
+    //     text: 'Edit Profile',
+    //     function: editProfile(),
+    //   );
+    // }
+  }
+
   buildProfileHeader() {
     return FutureBuilder(
         future: usersRef.document(widget.profileId).get(),
@@ -103,74 +173,5 @@ class _ProfileState extends State<Profile> {
         body: ListView(
           children: [buildProfileHeader()],
         ));
-  }
-
-  buildCountColumn(String label, int count) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          count.toString(),
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 4),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
-  Container buildButton({String text, Function function}) {
-    return Container(
-      padding: EdgeInsets.only(top: 2),
-      child: FlatButton(
-        onPressed: function,
-        child: Container(
-          width: 250,
-          height: 27,
-          child: Text(
-            text,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.blue,
-            border: Border.all(
-              color: Colors.blue,
-            ),
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
-      ),
-    );
-  }
-
-  buildProfileButton() {
-    bool isProfileOwner = currentUserId == widget.profileId;
-    if (isProfileOwner) {
-      return buildButton(
-        text: 'Edit Profile',
-        function: editProfile(),
-      );
-    }
-  }
-
-  editProfile() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => EditProfile(currentUserId: currentUserId)));
   }
 }

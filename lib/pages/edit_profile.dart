@@ -14,10 +14,13 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  final _scaffoldkey = GlobalKey<ScaffoldState>();
   TextEditingController displayNameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
   bool isLoading = false;
   User user;
+  bool _displayNameValid = true;
+  bool _bioValid = true;
 
   @override
   void initState() {
@@ -25,8 +28,66 @@ class _EditProfileState extends State<EditProfile> {
     getUser();
   }
 
+  getUser() async {
+    setState(() {
+      isLoading = true;
+    });
+    DocumentSnapshot doc = await usersRef.document(widget.currentUserId).get();
+    user = User.fromDocument(doc);
+    displayNameController.text = user.displayname;
+    bioController.text = user.bio;
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Column buildDisplayNameField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 12),
+          child: Text(
+            'Display Name',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+        TextField(
+          controller: displayNameController,
+          decoration: InputDecoration(
+              hintText: 'Update Display Name',
+              errorText: _displayNameValid ? null : "Display Name too short"),
+        )
+      ],
+    );
+  }
+
+  Column buildBioField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 12),
+          child: Text(
+            'Bio',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+        TextField(
+          controller: bioController,
+          decoration: InputDecoration(
+            hintText: 'Update Bio',
+            errorText: _bioValid ? null : "bio too long",
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldkey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
@@ -68,7 +129,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                     ),
                     RaisedButton(
-                      onPressed: () => print('update profile data'),
+                      onPressed: updateProfileData,
                       child: Text(
                         'Update Profile',
                         style: TextStyle(
@@ -98,54 +159,24 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  getUser() async {
+  updateProfileData() {
     setState(() {
-      isLoading = true;
+      displayNameController.text.trim().length < 3 ||
+              displayNameController.text.isEmpty
+          ? _displayNameValid = false
+          : _displayNameValid = true;
+      bioController.text.trim().length > 100
+          ? _bioValid = false
+          : _bioValid = true;
     });
-    DocumentSnapshot doc = await usersRef.document(widget.currentUserId).get();
-    user = User.fromDocument(doc);
-    displayNameController.text = user.displayname;
-    bioController.text = user.bio;
-    setState(() {
-      isLoading = false;
-    });
-  }
 
-  Column buildBioField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 12),
-          child: Text(
-            'Bio',
-            style: TextStyle(color: Colors.grey),
-          ),
-        ),
-        TextField(
-          controller: bioController,
-          decoration: InputDecoration(hintText: 'Update Bio'),
-        ),
-      ],
-    );
-  }
-
-  Column buildDisplayNameField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 12),
-          child: Text(
-            'Display Name',
-            style: TextStyle(color: Colors.grey),
-          ),
-        ),
-        TextField(
-          controller: displayNameController,
-          decoration: InputDecoration(hintText: 'Update Display Name'),
-        )
-      ],
-    );
+    if (_displayNameValid && _bioValid) {
+      usersRef.document(widget.currentUserId).updateData({
+        "displayName": displayNameController.text,
+        "bio": bioController.text,
+      });
+      SnackBar snackbar = SnackBar(content: Text('Profile updated!'));
+      _scaffoldkey.currentState.showSnackBar(snackbar);
+    }
   }
 }

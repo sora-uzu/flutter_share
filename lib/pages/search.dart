@@ -18,11 +18,16 @@ class _SearchState extends State<Search> {
 
   handleSearch(String query) {
     Future<QuerySnapshot> users = usersRef
-        .where('displayName', isGreaterThanOrEqualTo: query)
+        .where('displayname', isGreaterThanOrEqualTo: query)
         .getDocuments();
+    print(users);
     setState(() {
       searchResultsFuture = users;
     });
+  }
+
+  clearSearch() {
+    searchController.clear();
   }
 
   buildSearchField() {
@@ -101,10 +106,6 @@ class _SearchState extends State<Search> {
       body:
           searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
     );
-  }
-
-  clearSearch() {
-    searchController.clear();
   }
 }
 

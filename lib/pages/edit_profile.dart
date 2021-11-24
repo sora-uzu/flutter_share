@@ -142,7 +142,7 @@ class _EditProfileState extends State<EditProfile> {
                     Padding(
                       padding: EdgeInsets.all(16),
                       child: FlatButton.icon(
-                          onPressed: () => print('logout'),
+                          onPressed: logout,
                           icon: Icon(
                             Icons.cancel,
                             color: Colors.red,
@@ -157,6 +157,10 @@ class _EditProfileState extends State<EditProfile> {
               ],
             ),
     );
+  }
+
+  logout() {
+    googleSignIn.signOut();
   }
 
   updateProfileData() {

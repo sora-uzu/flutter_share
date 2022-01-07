@@ -59,8 +59,9 @@ class _TimelineState extends State<Timeline> {
       return circularProgress();
     } else if (posts.isEmpty) {
       return buildUsersToFollow();
+    } else {
+      return ListView(children: posts);
     }
-    return ListView(children: posts);
   }
 
   buildUsersToFollow() {
